@@ -1,0 +1,24 @@
+{
+  "name": "tuyel-electricals",
+  "version": "1.0.0",
+  "description": "TUYEL ELECTRICALS – Products, Repair & Services Platform",
+  "scripts": {
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "start:server": "cd server && npm start",
+    "build:client": "cd client && npm run build",
+    "db:init": "cd server && npm run db:init",
+    "admin:reset": "cd server && npm run admin:reset"
+  },
+  "keywords": [
+    "electrical",
+    "ecommerce",
+    "service-booking",
+    "react",
+    "nodejs",
+    "express",
+    "mysql"
+  ],
+  "author": "Tuyel Sk",
+  "license": "ISC"
+}
