@@ -2,18 +2,37 @@ services:
   - type: web
     name: tuyel-electricals-api
     runtime: node
+    region: singapore
+    plan: free
     rootDir: server
     buildCommand: npm install
     startCommand: npm start
-    plan: free
     autoDeploy: true
     envVars:
       - key: NODE_ENV
         value: production
+      - key: PORT
+        value: "10000"
       - key: DB_SSL
         value: "true"
+      - key: JWT_SECRET
+        generateValue: true
       - key: JWT_EXPIRES_IN
         value: 7d
+      - key: ADMIN_EMAIL
+        value: admin@tuyel.com
+      - key: ADMIN_PASSWORD
+        value: Admin@123
       - key: WHATSAPP_NUMBER
         value: "916294156854"
+      - key: DB_PORT
+        value: "4000"
+      - key: DB_NAME
+        value: tuyel_electricals
+      - key: DB_HOST
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
 
