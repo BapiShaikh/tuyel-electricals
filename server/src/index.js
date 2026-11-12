@@ -4,6 +4,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
 const morgan = require('morgan');
+const fs = require('fs');
 const path = require('path');
 const rateLimit = require('express-rate-limit');
 
@@ -12,11 +13,41 @@ const routes = require('./routes');
 const { errorHandler } = require('./middlewares/errorHandler');
 const bcrypt = require('bcryptjs');
 
+// Auto-initialize schema if tables do not exist yet on remote TiDB
+const ensureDatabaseSchema = async () => {
+  try {
+    const [tables] = await pool.query("SHOW TABLES LIKE 'roles'");
+    if (tables.length === 0) {
+      console.log('⚡ First boot: Database tables not found. Initializing schema and seed data from database.sql...');
+      const candidates = [
+        path.join(__dirname, '../../database.sql'),
+        path.join(__dirname, '../database.sql'),
+        path.join(process.cwd(), 'database.sql'),
+        path.join(process.cwd(), '../database.sql'),
+        path.join(__dirname, '../../../database.sql')
+      ];
+      const sqlPath = candidates.find(p => fs.existsSync(p));
+      if (sqlPath) {
+        console.log(`📖 Loading SQL from: ${sqlPath}`);
+        const sql = fs.readFileSync(sqlPath, 'utf8');
+        await pool.query(sql);
+        console.log('✅ Database schema and seed data initialized successfully!');
+      } else {
+        console.warn('⚠️ database.sql not found in search paths.');
+      }
+    }
+  } catch (err) {
+    console.warn('⚠️  Database schema initialization note:', err.message);
+  }
+};
+
 // Auto-sync admin user on boot
 const ensureAdminUser = async () => {
   try {
-    const adminEmail = (process.env.ADMIN_EMAIL || 'admin@tuyel.com').toLowerCase();
-    const adminPassword = process.env.ADMIN_PASSWORD || 'Admin@123';
+    let adminEmail = (process.env.ADMIN_EMAIL || 'admin@tuyel.com').toLowerCase().trim();
+    if (adminEmail === 'adminatuyel.com') adminEmail = 'admin@tuyel.com';
+    let adminPassword = (process.env.ADMIN_PASSWORD || 'Admin@123').trim();
+    if (adminPassword === 'Admina123') adminPassword = 'Admin@123';
 
     const [roles] = await pool.query('SELECT id FROM roles WHERE name = "admin" LIMIT 1');
     let adminRoleId = 1;
@@ -28,7 +59,7 @@ const ensureAdminUser = async () => {
     }
 
     const hashed = await bcrypt.hash(adminPassword, 10);
-    const [users] = await pool.query('SELECT id, password FROM users WHERE LOWER(email) = ?', [adminEmail]);
+    const [users] = await pool.query('SELECT id, password FROM users WHERE LOWER(email) = ? OR LOWER(email) = "admin@tuyel.com"', [adminEmail]);
 
     if (users.length === 0) {
       await pool.query(
@@ -122,6 +153,7 @@ app.use(errorHandler);
 const startServer = async () => {
   try {
     await testConnection();
+    await ensureDatabaseSchema();
     await ensureAdminUser();
     app.listen(PORT, () => {
       console.log(`\n🚀 TUYEL ELECTRICALS Server running on port ${PORT}`);
