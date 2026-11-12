@@ -55,10 +55,6 @@ const login = async (req, res, next) => {
         console.warn('⚠️ Admin auto-heal warning:', adminHealErr.message);
       }
     }
-      } catch (healErr) {
-        console.error('Admin auto-heal error:', healErr.message);
-      }
-    }
 
     if (rows.length === 0) {
       return res.status(401).json({ success: false, message: 'Invalid email or password' });
