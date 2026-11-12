@@ -214,8 +214,7 @@ CREATE TABLE products (
   FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL,
   FOREIGN KEY (brand_id) REFERENCES brands(id) ON DELETE SET NULL,
   INDEX idx_category (category_id),
-  INDEX idx_brand (brand_id),
-  FULLTEXT INDEX ft_search (name, description, short_description)
+  INDEX idx_brand (brand_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================

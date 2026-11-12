@@ -14,7 +14,10 @@ const getProducts = async (req, res, next) => {
     if (maxPrice) { where.push('p.selling_price <= ?'); params.push(parseFloat(maxPrice)); }
     if (featured === 'true') { where.push('p.is_featured = 1'); }
     if (bestseller === 'true') { where.push('p.is_bestseller = 1'); }
-    if (search) { where.push('MATCH(p.name, p.description, p.short_description) AGAINST(? IN BOOLEAN MODE)'); params.push(`*${search}*`); }
+    if (search) {
+      where.push('(p.name LIKE ? OR p.short_description LIKE ? OR p.description LIKE ?)');
+      params.push(`%${search}%`, `%${search}%`, `%${search}%`);
+    }
 
     const whereStr = where.length ? 'WHERE ' + where.join(' AND ') : '';
     const allowedSort = ['created_at', 'selling_price', 'name', 'views'];
