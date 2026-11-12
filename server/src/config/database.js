@@ -13,7 +13,10 @@ const pool = mysql.createPool({
   queueLimit: 0,
   timezone: '+05:30',
   charset: 'utf8mb4',
-  ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : undefined
+  ssl: (process.env.DB_SSL === 'true' || (process.env.DB_HOST && process.env.DB_HOST.includes('tidbcloud.com'))) ? {
+    minVersion: 'TLSv1.2',
+    rejectUnauthorized: false
+  } : undefined
 });
 
 const testConnection = async () => {
