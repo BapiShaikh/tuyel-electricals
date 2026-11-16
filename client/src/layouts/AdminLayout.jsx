@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Package, Tags, Building2, Wrench, FolderOpen, ClipboardList,
-  ShoppingBag, Users, Warehouse, Settings, LogOut, Menu, X, Zap, Bell
+  ShoppingBag, Users, Warehouse, Settings, LogOut, Menu, X, Zap, Bell, Sliders
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -48,8 +48,9 @@ const AdminLayout = ({ children, title }) => {
       ]
     },
     {
-      label: 'System',
+      label: 'System & Design',
       items: [
+        { to: '/admin/banners', icon: <Sliders size={18} />, label: 'Hero Sliders' },
         { to: '/admin/settings', icon: <Settings size={18} />, label: 'Website Settings' },
       ]
     }

@@ -108,6 +108,19 @@ export const authAPI = {
   changePassword: (data) => api.put('/auth/change-password', data),
 };
 
+// Banners
+export const bannerAPI = {
+  getAll: () => api.get('/banners'),
+  getAllAdmin: () => api.get('/admin/banners'),
+  create: (data) => api.post('/admin/banners', data, {
+    headers: data instanceof FormData ? { 'Content-Type': 'multipart/form-data' } : undefined
+  }),
+  update: (id, data) => api.put(`/admin/banners/${id}`, data, {
+    headers: data instanceof FormData ? { 'Content-Type': 'multipart/form-data' } : undefined
+  }),
+  delete: (id) => api.delete(`/admin/banners/${id}`),
+};
+
 // Settings
 export const settingsAPI = {
   getPublic: () => api.get('/settings'),

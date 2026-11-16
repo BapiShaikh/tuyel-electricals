@@ -27,6 +27,7 @@ import AdminInventoryPage from './pages/admin/AdminInventoryPage';
 import AdminCategoriesPage from './pages/admin/AdminCategoriesPage';
 import AdminBrandsPage from './pages/admin/AdminBrandsPage';
 import AdminServiceCategoriesPage from './pages/admin/AdminServiceCategoriesPage';
+import AdminBannersPage from './pages/admin/AdminBannersPage';
 
 // Protected Route Component
 const AdminRoute = ({ children }) => {
@@ -67,6 +68,7 @@ function App() {
               <Route path="/admin/orders/:id" element={<AdminRoute><AdminOrderDetailPage /></AdminRoute>} />
               <Route path="/admin/customers" element={<AdminRoute><AdminCustomersPage /></AdminRoute>} />
               <Route path="/admin/inventory" element={<AdminRoute><AdminInventoryPage /></AdminRoute>} />
+              <Route path="/admin/banners" element={<AdminRoute><AdminBannersPage /></AdminRoute>} />
               <Route path="/admin/settings" element={<AdminRoute><AdminSettingsPage /></AdminRoute>} />
 
               {/* 404 Route */}

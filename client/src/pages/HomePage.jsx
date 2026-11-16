@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Zap, Wrench, Star, Phone, MapPin, CheckCircle, Clock, Shield, Award, ChevronRight, MessageCircle } from 'lucide-react';
-import { productAPI, serviceAPI, settingsAPI } from '../services/api';
+import { productAPI, serviceAPI, settingsAPI, bannerAPI } from '../services/api';
 import { formatCurrency, getImageUrl } from '../utils/helpers';
 import { useSettings } from '../context/SettingsContext';
 import { useCart } from '../context/CartContext';
 import PublicLayout from '../layouts/PublicLayout';
 import ProductCard from '../components/products/ProductCard';
+import HeroSlider from '../components/home/HeroSlider';
 
 // Hero Section
 const Hero = ({ settings }) => (
@@ -309,18 +310,21 @@ const ContactCTA = ({ settings }) => (
 const HomePage = () => {
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [bestSellers, setBestSellers] = useState([]);
+  const [banners, setBanners] = useState([]);
   const [loading, setLoading] = useState(true);
   const { settings } = useSettings();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [featuredRes, bestRes] = await Promise.all([
+        const [featuredRes, bestRes, bannersRes] = await Promise.all([
           productAPI.getAll({ featured: 'true', limit: 8 }),
           productAPI.getAll({ bestseller: 'true', limit: 8 }),
+          bannerAPI.getAll().catch(() => ({ data: { data: [] } })),
         ]);
         setFeaturedProducts(featuredRes.data.data || []);
         setBestSellers(bestRes.data.data || []);
+        setBanners(bannersRes.data.data || []);
       } catch (err) {
         console.error('Failed to load products:', err);
       } finally {
@@ -332,7 +336,7 @@ const HomePage = () => {
 
   return (
     <PublicLayout>
-      <Hero settings={settings} />
+      <HeroSlider banners={banners} settings={settings} />
       <CategoryGrid />
       
       {/* Featured Products */}
