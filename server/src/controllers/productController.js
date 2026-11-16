@@ -96,6 +96,11 @@ const createProduct = async (req, res, next) => {
           [productId, `/uploads/products/${req.files[i].filename}`, i === 0 ? 1 : 0, i]
         );
       }
+    } else if (req.body.image_url && req.body.image_url.trim()) {
+      await conn.query(
+        'INSERT INTO product_images (product_id, image_path, is_primary, sort_order) VALUES (?,?,?,0)',
+        [productId, req.body.image_url.trim(), 1]
+      );
     }
 
     // Record inventory
@@ -147,13 +152,21 @@ const updateProduct = async (req, res, next) => {
     }
 
     if (req.files && req.files.length > 0) {
-      const [existingImages] = await conn.query('SELECT COUNT(*) as cnt FROM product_images WHERE product_id = ?', [id]);
+      // Demote existing images so the newly uploaded file becomes the primary image
+      await conn.query('UPDATE product_images SET is_primary = 0 WHERE product_id = ?', [id]);
       for (let i = 0; i < req.files.length; i++) {
         await conn.query(
           'INSERT INTO product_images (product_id, image_path, is_primary, sort_order) VALUES (?,?,?,?)',
-          [id, `/uploads/products/${req.files[i].filename}`, existingImages[0].cnt === 0 && i === 0 ? 1 : 0, existingImages[0].cnt + i]
+          [id, `/uploads/products/${req.files[i].filename}`, i === 0 ? 1 : 0, i]
         );
       }
+    } else if (req.body.image_url && req.body.image_url.trim()) {
+      // If admin entered a direct image URL (e.g. Unsplash or web link), set it as primary
+      await conn.query('UPDATE product_images SET is_primary = 0 WHERE product_id = ?', [id]);
+      await conn.query(
+        'INSERT INTO product_images (product_id, image_path, is_primary, sort_order) VALUES (?,?,?,0)',
+        [id, req.body.image_url.trim(), 1]
+      );
     }
 
     await conn.commit();

@@ -61,7 +61,7 @@ const AdminProductsPage = () => {
     setEditProduct(null);
     setForm({ name: '', sku: '', model_number: '', category_id: '', brand_id: '', short_description: '',
       description: '', original_price: '', selling_price: '', stock_quantity: '', warranty_months: '',
-      warranty_description: '', is_featured: false, is_bestseller: false, low_stock_threshold: '5', is_active: true });
+      warranty_description: '', is_featured: false, is_bestseller: false, low_stock_threshold: '5', is_active: true, image_url: '' });
     setImages([]); setImagePreviews([]);
     setShowModal(true);
   };
@@ -76,9 +76,11 @@ const AdminProductsPage = () => {
       stock_quantity: product.stock_quantity || '', warranty_months: product.warranty_months || '',
       warranty_description: product.warranty_description || '', is_featured: !!product.is_featured,
       is_bestseller: !!product.is_bestseller, low_stock_threshold: product.low_stock_threshold || '5',
-      is_active: product.is_active !== 0
+      is_active: product.is_active !== 0,
+      image_url: ''
     });
-    setImages([]); setImagePreviews([]);
+    setImages([]);
+    setImagePreviews(product.primary_image ? [getImageUrl(product.primary_image)] : []);
     setShowModal(true);
   };
 
@@ -86,6 +88,7 @@ const AdminProductsPage = () => {
     const files = Array.from(e.target.files);
     setImages(files);
     setImagePreviews(files.map(f => URL.createObjectURL(f)));
+    setForm(f => ({ ...f, image_url: '' }));
   };
 
   const handleSave = async (e) => {
@@ -308,17 +311,42 @@ const AdminProductsPage = () => {
               </div>
               {/* Images */}
               <div>
-                <label className="label">Product Images</label>
-                <label className="flex items-center gap-3 p-3 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-electric-400 transition-colors">
+                <label className="label">Product Image</label>
+                
+                {/* Upload File */}
+                <label className="flex items-center gap-3 p-3 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-electric-400 transition-colors bg-gray-50/50">
                   <Upload size={20} className="text-gray-400" />
-                  <span className="text-sm text-gray-500">Click to select images (max 10, 5MB each)</span>
+                  <span className="text-sm text-gray-500">Upload new image file from your device</span>
                   <input ref={fileRef} type="file" multiple accept="image/*" onChange={handleImageChange} className="hidden" />
                 </label>
+
+                {/* OR Image URL */}
+                <div className="mt-2.5">
+                  <div className="text-xs text-gray-500 font-medium mb-1">OR paste direct Image URL (e.g. Unsplash or web link):</div>
+                  <input 
+                    type="url" 
+                    value={form.image_url || ''} 
+                    onChange={e => {
+                      const val = e.target.value;
+                      setForm(f => ({ ...f, image_url: val }));
+                      if (val) setImagePreviews([val]);
+                    }} 
+                    placeholder="https://images.unsplash.com/..." 
+                    className="input-field text-sm py-2" 
+                  />
+                </div>
+
                 {imagePreviews.length > 0 && (
-                  <div className="flex gap-2 mt-2 flex-wrap">
-                    {imagePreviews.map((src, i) => (
-                      <img key={i} src={src} alt="" className="w-16 h-16 object-contain border rounded-lg bg-gray-50" />
-                    ))}
+                  <div className="mt-3">
+                    <span className="text-xs text-gray-500 font-medium">Selected / Current Primary Image:</span>
+                    <div className="flex gap-2 mt-1.5 flex-wrap">
+                      {imagePreviews.map((src, i) => (
+                        <div key={i} className="relative group">
+                          <img src={src} alt="Preview" className="w-20 h-20 object-contain border rounded-lg bg-gray-50 shadow-sm" />
+                          <span className="absolute -top-1.5 -right-1.5 bg-electric-600 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold">Active</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
