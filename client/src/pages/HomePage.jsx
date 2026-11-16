@@ -13,7 +13,7 @@ import HeroSlider from '../components/home/HeroSlider';
 const Hero = ({ settings }) => (
   <section className="hero-gradient text-white relative overflow-hidden">
     {/* Background pattern */}
-    <div className="absolute inset-0 opacity-10">
+    <div className="absolute inset-0 opacity-5">
       <div className="absolute top-10 left-10 w-64 h-64 rounded-full bg-electric-400 filter blur-3xl"></div>
       <div className="absolute bottom-10 right-10 w-80 h-80 rounded-full bg-brand-orange filter blur-3xl"></div>
     </div>
