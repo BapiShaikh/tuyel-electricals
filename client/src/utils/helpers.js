@@ -66,7 +66,10 @@ export const getCategoryFallbackImage = (hint = '') => {
 export const getImageUrl = (path, hint = '') => {
   if (!path) return getCategoryFallbackImage(hint);
   if (path.startsWith('http')) return path;
-  const base = import.meta.env.VITE_API_URL?.replace('/api/v1', '') || 'http://localhost:5000';
+  const defaultBase = typeof window !== 'undefined' && window.location.hostname !== 'localhost'
+    ? 'https://tuyel-electricals.onrender.com'
+    : 'http://localhost:5000';
+  const base = import.meta.env.VITE_API_URL?.replace('/api/v1', '') || defaultBase;
   return `${base}${path}`;
 };
 

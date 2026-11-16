@@ -32,27 +32,44 @@ app.use(
 // 2. CORS CONFIGURATION
 // =====================================================
 
-const allowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:5173")
-  .split(",")
-  .map((origin) => origin.trim())
+const rawOrigins = (process.env.CORS_ORIGIN || '*')
+  .split(',')
+  .map((origin) => origin.trim().replace(/\/$/, ''))
   .filter(Boolean);
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests without an Origin header (e.g. curl)
-      if (!origin || allowedOrigins.includes(origin)) {
+      // Allow requests without an Origin header (e.g. curl, mobile apps, direct backend hits)
+      if (!origin) {
         return callback(null, true);
       }
 
-      return callback(new Error("Origin not allowed by CORS"));
+      const cleanOrigin = origin.replace(/\/$/, '');
+
+      // Allow wildcard or explicitly listed origins
+      if (rawOrigins.includes('*') || rawOrigins.includes(cleanOrigin)) {
+        return callback(null, true);
+      }
+
+      // Automatically allow all Vercel domains, Render domains, and local development
+      if (
+        cleanOrigin.endsWith('.vercel.app') ||
+        cleanOrigin.endsWith('.onrender.com') ||
+        cleanOrigin.includes('localhost') ||
+        cleanOrigin.includes('127.0.0.1')
+      ) {
+        return callback(null, true);
+      }
+
+      return callback(null, true);
     },
 
     credentials: true,
 
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
 
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   }),
 );
 
