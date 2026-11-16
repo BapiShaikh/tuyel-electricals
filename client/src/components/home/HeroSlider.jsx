@@ -293,3 +293,4 @@ const HeroSlider = ({ banners = [], settings = {} }) => {
 };
 
 export default HeroSlider;
+
